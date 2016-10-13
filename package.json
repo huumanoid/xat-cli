@@ -1,0 +1,15 @@
+{
+  "name": "xat-cli",
+  "version": "0.1.0",
+  "description": "Command line interface for xat compatible chats based on ncurses.",
+  "main": "index.js",
+  "repository": {
+    "url": "git@github.com:HuuMaNoID/xat-cli.git",
+    "type": "git"
+  },
+  "author": "huumanoid",
+  "license": "MIT",
+  "dependencies": {
+    "blessed": "^0.1.81"
+  }
+}
