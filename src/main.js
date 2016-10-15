@@ -2,9 +2,9 @@
 const blessed = require('blessed');
 const XatUser = require('xat-client').XatUser;
 const config = require('../config.js');
-const Chatbox = require('./widgets/chatbox');
+const Chat = require('./widgets/chat');
 
-let chatbox = null;
+let chat = null;
 
 const screen = blessed.screen({
   fullUnicode: true,
@@ -40,9 +40,20 @@ command.on('submit', function (value) {
   if (value === 'q') {
     return process.exit();
   } else if (value === 'm') {
-    chatbox.messages.focus();
+    chat.messages.focus();
   } else if (value === 'u') {
-    chatbox.userElements.focus();
+    chat.userElements.focus();
+  } else if (cmd === 'log') {
+    chat.chatbox.hide();
+    chat.logBox.show();
+    chat.logBox.focus();
+    screen.realloc();
+    screen.render();
+  } else if (cmd === 'nolog') {
+    chat.logBox.hide();
+    chat.chatbox.show();
+    screen.realloc();
+    screen.render();
   } else if (cmd === 'signin') {
     client.sendTextMessage('/go#' + args[1]);
     const redirect = function redirect(data) {
@@ -67,7 +78,7 @@ command.on('submit', function (value) {
 
 const client = new XatUser(config.user).addExtension('user-actions').addExtension('extended-events').addExtension('chat-data');
 
-chatbox = new Chatbox({ 
+chat = new Chat({ 
   parent: screen,
   height: '100%-1',
   config: config,
@@ -78,7 +89,7 @@ chatbox = new Chatbox({
 
 screen.key(['i'], () => {
   command.setContent("{bold}-- INSERT --{/}");
-  chatbox.messageBox.focus();
+  chat.messageBox.focus();
   screen.render();
 });
 

@@ -3,7 +3,7 @@ const blessed = require('blessed');
 const widget = blessed.widget;
 
 module.exports =
-class Chatbox extends widget.Box {
+class Chat extends widget.Box {
   constructor(options) {
     super(options);
     const command = options.command;
@@ -11,7 +11,9 @@ class Chatbox extends widget.Box {
     const client = this.client = options.client;
     const config = this.config = options.config;
 
-    const chatbox = this;
+    const chatbox = this.chatbox = blessed.box({
+      parent: this,
+    });
 
     const messages = this.messagesBox = blessed.box({
       parent: chatbox,
@@ -56,6 +58,17 @@ class Chatbox extends widget.Box {
       height: 3,
       content: 'text',
       inputOnFocus: true,
+    });
+
+    const logbox = this.logBox = blessed.box({
+      parent: this,
+      hidden: true,
+      border: 'line',
+      scrollable: true,
+      alwaysScroll: true,
+      keys: true,
+      vi: true,
+      tags: true,
     });
 
     this.messageBox.on('submit', (message) => {
@@ -104,6 +117,8 @@ class Chatbox extends widget.Box {
       let user = data.xml;
       let online = user.o === undefined;
       user = (user.o || user.u).attributes;
+
+      user = JSON.parse(JSON.stringify(user));//clone
       user.online = online;
       this.addUser(user);
       screen.render();
@@ -113,6 +128,13 @@ class Chatbox extends widget.Box {
       command.setContent('connected');
       this.rebuildUserList();
       screen.render();
+    });
+
+    client.on('data', (data) => {
+      this.logBox.pushLine('{red-fg}IN:  {/}' + blessed.escape(JSON.stringify(data)));
+    });
+    client.on('send', (data) => {
+      this.logBox.pushLine('{blue-fg}OUT: {/}' + blessed.escape(JSON.stringify(data.xml)));
     });
   }
 
