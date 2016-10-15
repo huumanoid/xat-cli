@@ -27,6 +27,9 @@ const command = blessed.textbox({
   tags: true,
 });
 
+let commandHistory = [];
+let commandHistoryPointer = -1;
+
 command.on('focus', function () {
   command.setValue(':');
   screen.render();
@@ -36,7 +39,36 @@ command.key(['backspace'], function (ch, key) {
     command.cancel();
   }
 });
+command.key(['up', 'down'], function (ch, key) {
+  if (command.value === ':' || commandHistoryPointer !== -1) {
+    if (commandHistoryPointer === -1)
+      commandHistoryPointer = commandHistory.length;
+    if (key.name === 'up') {
+      commandHistoryPointer--;
+      if (commandHistoryPointer < 0)
+        commandHistoryPointer = 0;
+    } else {
+      commandHistoryPointer++;
+      if (commandHistoryPointer >= commandHistory.length) {
+        command.setValue(':');
+        commandHistoryPointer = -1;
+        screen.render();
+        return;
+      }
+    }
+    if (commandHistoryPointer !== -1) {
+      command.setValue(commandHistory[commandHistoryPointer]);
+      screen.render();
+    }
+  }
+});
+command.on('keypress', (ch, key) => {
+  if (key.name !== 'up' && key.name !== 'down') {
+    commandHistoryPointer = -1;
+  }
+});
 command.on('submit', function (value) {
+  commandHistory.push(value);
   value = value.substr(1).trim();
   function setError(message) {
     command.setContent('{red-bg}{white-fg}{bold}' + message + '{/}');
@@ -63,6 +95,7 @@ command.on('submit', function (value) {
   } else if (cmd === 'nolog') {
     chat.logBox.hide();
     chat.chatbox.show();
+    chat.chatbox.focus();
     screen.realloc();
     screen.render();
   } else if (cmd === 'signin') {
