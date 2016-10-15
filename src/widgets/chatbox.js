@@ -13,7 +13,7 @@ class Chatbox extends widget.Box {
 
     const chatbox = this;
 
-    const messages = this.messages = blessed.box({
+    const messages = this.messagesBox = blessed.box({
       parent: chatbox,
       border: 'line',
       //height: '40%',
@@ -34,7 +34,7 @@ class Chatbox extends widget.Box {
     });
     this.users = [];
 
-    this.userElements = blessed.box({
+    this.usersBox = blessed.box({
       parent: chatbox,
       //height: '40%',
       height: '100%-3',
@@ -73,9 +73,9 @@ class Chatbox extends widget.Box {
 
     client.on('connect', () => {
       command.setContent('connecting to ' + client.todo.w_useroom + '...');
-      while (this.messages.children.length) {
-        const message = this.messages.children[this.messages.children.length - 1];
-        this.messages.remove(message);
+      while (this.messagesBox.children.length) {
+        const message = this.messagesBox.children[this.messagesBox.children.length - 1];
+        this.messagesBox.remove(message);
       }
       this.users = [];
       this.rebuildUserList();
@@ -92,7 +92,7 @@ class Chatbox extends widget.Box {
     });
     client.on('ee-user-signout', (data) => {
       let userId = data.xml.l.attributes.u;
-      let user = this.users[this.findUser(userId)];
+      let user = this.findUser(userId);
       if (user) {
         user.online = false;
         this.rebuildUserList();
@@ -124,12 +124,12 @@ class Chatbox extends widget.Box {
 
     if (userId) {
       user = this.findUser(userId);
-      if (user >= 0)
-        userName = this.cleanName(this.users[user]);
+      if (user)
+        userName = this.cleanName(user);
     }
 
-    const userColor = user >= 0 ? this.getUserColor(this.users[user]) : null;
-    const headerContent = user >= 0 ? '{' + userColor + '-fg}' + userName + '{/}' : (userId === this.client.todo.w_userno ? 'You' : 'System');
+    const userColor = user ? this.getUserColor(user) : null;
+    const headerContent = user ? '{' + userColor + '-fg}' + userName + '{/}' : (userId === this.client.todo.w_userno ? 'You' : 'System');
 
     const header = blessed.box({
       top: 0,
@@ -142,15 +142,15 @@ class Chatbox extends widget.Box {
     const messageContent = blessed.box({
       content: '{bold}' + blessed.escape(content) + '{/}',
       top: 0,
-      height: content.length / this.messages.width + (content.length % this.messages.width > 0),
+      height: content.length / this.messagesBox.width + (content.length % this.messagesBox.width > 0),
       left: 20,
       tags: true,
     });
 
 
     const messageContainer = blessed.box({
-      parent: this.messages,
-      top: 1 * this.messages.children.length,
+      parent: this.messagesBox,
+      top: 1 * this.messagesBox.children.length,
       scrollable: true,
       height: 1,
     });
@@ -159,11 +159,11 @@ class Chatbox extends widget.Box {
     messageContainer.append(messageContent);
 
     if (true) {
-      this.messages.setScrollPerc(100);//scrollTo(messages.children.length - 30);
+      this.messagesBox.setScrollPerc(100);//scrollTo(messages.children.length - 30);
     }
   }
 
-  findUser(userId) {
+  findUserIndex(userId) {
     for (let i = 0; i < this.users.length; ++i) {
       if (this.users[i].u === userId) {
         return i;
@@ -171,14 +171,25 @@ class Chatbox extends widget.Box {
     }
     return -1;
   }
+  findUser(userId) {
+    return this.users[this.findUserIndex(userId)] || null;
+  }
 
   rebuildUserList() {
-    const userElements = this.userElements;
-    while (userElements.children.length) {
-      const element = userElements.children[userElements.children.length - 1];
-      userElements.remove(element);
+    const usersBox = this.usersBox;
+    while (usersBox.children.length) {
+      const element = usersBox.children[usersBox.children.length - 1];
+      usersBox.remove(element);
     }
     this.users.sort((u1, u2) => {
+      if (u1.u === this.client.todo.w_userno) {
+        return 1;
+      }
+
+      if (u2.u === this.client.todo.w_userno) {
+        return -1;
+      }
+
       if (u1.online != u2.online) {
         return u2.online - u1.online;
       }
@@ -229,16 +240,16 @@ class Chatbox extends widget.Box {
     let userElement = blessed.box({
       content: content,
       tags: true,
-      top: 1 * this.userElements.children.length,
+      top: 1 * this.usersBox.children.length,
       height: 1,
     });
 
     userElement.data.user = user;
-    this.userElements.insert(userElement, i);
+    this.usersBox.insert(userElement, i);
   }
 
   addUser(user) {
-    const old = this.findUser(user.u);
+    const old = this.findUserIndex(user.u);
     if (old >= 0) {
       this.users.splice(old, 1);
     }
