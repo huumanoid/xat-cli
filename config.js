@@ -7,6 +7,16 @@ module.exports = {
     mainowner: 'magenta',
     offline: 'red',
   },
+  httpservices: {
+    id2reg: {
+      method: 'http',
+      url: 'http://xat.me/_?id=#id#',
+      placeholder: '#id#',
+      fetchResult: function (body) {
+        return body;
+      }
+    }
+  },
   user: {
     todo: {
       w_autologin: 1,

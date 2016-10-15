@@ -1,6 +1,9 @@
 'use strict';
+const http = require('http');
+
 const blessed = require('blessed');
 const XatUser = require('xat-client').XatUser;
+
 const config = require('../config.js');
 const Chat = require('./widgets/chat');
 
@@ -35,14 +38,22 @@ command.key(['backspace'], function (ch, key) {
 });
 command.on('submit', function (value) {
   value = value.substr(1).trim();
+  function setError(message) {
+    command.setContent('{red-bg}{white-fg}{bold}' + message + '{/}');
+    screen.render();
+  }
+
   const args = value.split(' ');
   const cmd = args[0];
+  let error = null;
+  let response = ''
+
   if (value === 'q') {
-    return process.exit();
+    process.exit();
   } else if (value === 'm') {
-    chat.messages.focus();
+    chat.messagesBox.focus();
   } else if (value === 'u') {
-    chat.userElements.focus();
+    chat.usersBox.focus();
   } else if (cmd === 'log') {
     chat.chatbox.hide();
     chat.logBox.show();
@@ -65,11 +76,31 @@ command.on('submit', function (value) {
       }
     }
     client.on('data', redirect);
+  } else if (cmd === 'id2reg' || cmd === 'idtoreg') {
+    if (!config.httpservices || !config.httpservices.id2reg) {
+      return setError('id2reg is not supported');
+    }
+
+    if (!args[1]) {
+      return setError('id2reg invalid format. Usage: id2reg id');
+    }
+
+    const id2reg = config.httpservices.id2reg;
+
+    http.get(id2reg.url.replace(id2reg.placeholder, args[1]), (res) => {
+      let body = '';
+      res.on('data', (chunk) => body += chunk);
+      res.on('end', () => {
+        command.setValue(`id2reg for ${args[1]} is ${id2reg.fetchResult(body)}`);
+        screen.render();
+      });
+    }).on('error', (e) => {
+      setError('id2reg http error:' + JSON.stringify(e));
+    });
   } else if (command === 'locate') {
     client.sendLocate(args[1]);
   } else {
-    command.setValue('{red-bg}{white-fg}{bold}Unknown command: ' + value + '{/}');
-    return screen.render();
+    return setError('Unknown command: ' + value);
   }
   command.setValue('');
   screen.render();
@@ -87,11 +118,7 @@ chat = new Chat({
 //  hidden: true,
 });
 
-screen.key(['i'], () => {
-  command.setContent("{bold}-- INSERT --{/}");
-  chat.messageBox.focus();
-  screen.render();
-});
+chat.chatbox.focus();
 
 screen.key([':'], () => command.focus());
 

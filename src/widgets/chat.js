@@ -1,6 +1,7 @@
 'use strict';
 const blessed = require('blessed');
 const widget = blessed.widget;
+const util = require('util');
 
 module.exports =
 class Chat extends widget.Box {
@@ -18,6 +19,7 @@ class Chat extends widget.Box {
     const messages = this.messagesBox = blessed.box({
       parent: chatbox,
       border: 'line',
+      keyable: true,
       //height: '40%',
       height: '100%-3',
       keys: true,
@@ -34,6 +36,9 @@ class Chat extends widget.Box {
       },
       alwaysScroll: true,
     });
+    messages.on('keypress', (ch, key) => {
+      chatbox.emit('key ' + key.full);
+    });
     this.users = [];
 
     this.usersBox = blessed.box({
@@ -47,6 +52,9 @@ class Chat extends widget.Box {
       scrollbar: {
       },
       alwaysScroll: true,
+    });
+    this.usersBox.on('keypress', (ch, key) => {
+      chatbox.emit('key ' + key.full);
     });
 
     this.messageBox = blessed.textbox({ 
@@ -81,6 +89,12 @@ class Chat extends widget.Box {
     });
     this.messageBox.on('cancel', () => {
       command.setContent();
+      screen.render();
+    });
+
+    chatbox.key(['i'], () => {
+      command.setContent("{bold}-- INSERT --{/}");
+      this.messageBox.focus();
       screen.render();
     });
 
@@ -131,11 +145,12 @@ class Chat extends widget.Box {
     });
 
     client.on('data', (data) => {
-      this.logBox.pushLine('{red-fg}IN:  {/}' + blessed.escape(JSON.stringify(data)));
+      this.logBox.pushLine('{red-fg}IN:  {/}' + util.inspect(data, { breakLength: Infinity, colors: true }));
     });
     client.on('send', (data) => {
-      this.logBox.pushLine('{blue-fg}OUT: {/}' + blessed.escape(JSON.stringify(data.xml)));
+      this.logBox.pushLine('{blue-fg}OUT: {/}' + util.inspect(data.xml, { breakLength: Infinity, colors: true }));
     });
+    chatbox.focus();
   }
 
   addMessage(message) {
