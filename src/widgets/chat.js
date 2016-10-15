@@ -19,9 +19,16 @@ class Chat extends widget.Box {
     const messages = this.messagesBox = blessed.box({
       parent: chatbox,
       border: 'line',
+      style: {
+        focus: {
+          border: {
+            fg: 'blue',
+          },
+        },
+      },
       keyable: true,
       //height: '40%',
-      height: '100%-3',
+      height: '100%-4',
       keys: true,
       vi: true,
       width: '80%',
@@ -44,10 +51,17 @@ class Chat extends widget.Box {
     this.usersBox = blessed.box({
       parent: chatbox,
       //height: '40%',
-      height: '100%-3',
+      height: '100%-4',
       width: '20%',
       left: '80%',
       border: 'line',
+      style: {
+        focus: {
+          border: {
+            fg: 'blue',
+          },
+        },
+      },
       scrollable: true,
       scrollbar: {
       },
@@ -61,6 +75,11 @@ class Chat extends widget.Box {
       parent: chatbox,
       border: 'line',
       style: {
+        focus: {
+          border: {
+            fg: 'blue',
+          },
+        },
       },
       top: '100%-3',
       height: 3,
@@ -77,6 +96,12 @@ class Chat extends widget.Box {
       keys: true,
       vi: true,
       tags: true,
+    });
+
+    this.tabs = blessed.box({
+      parent: chatbox,
+      top: '100%-4',
+      height: 1,
     });
 
     this.messageBox.on('submit', (message) => {
@@ -170,30 +195,38 @@ class Chat extends widget.Box {
 
     const header = blessed.box({
       top: 0,
+      left: 0,
       height: 1,
       width: 20,
       content: headerContent,
       tags: true,
     });
 
+    const height = (content.length / this.messagesBox.width | 0) + (content.length % this.messagesBox.width > 0);
     const messageContent = blessed.box({
       content: '{bold}' + blessed.escape(content) + '{/}',
       top: 0,
-      height: content.length / this.messagesBox.width + (content.length % this.messagesBox.width > 0),
+      height: height,
       left: 20,
       tags: true,
     });
 
 
+    const position = (this.messagesBox.children.length ? this.messagesBox.children.slice(-1)[0].top : 0)
+    const prevHeight = (this.messagesBox.children.length ? this.messagesBox.children.slice(-1)[0].height : 1);
+
     const messageContainer = blessed.box({
       parent: this.messagesBox,
-      top: 1 * this.messagesBox.children.length,
+      top: position - 1 + prevHeight,
+      left: 0,
+      width: '100%-4',
       scrollable: true,
-      height: 1,
+      height: height,
     });
 
     messageContainer.append(header);
     messageContainer.append(messageContent);
+    messageContainer.data.userId = userId;
 
     if (true) {
       this.messagesBox.setScrollPerc(100);//scrollTo(messages.children.length - 30);
