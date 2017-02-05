@@ -4,10 +4,12 @@ const http = require('http');
 const blessed = require('blessed');
 const XatUser = require('xat-client').XatUser;
 
-const config = require('../config.js');
+const ConfigurationManager = require('./config')
+
+const config = new ConfigurationManager()
 
 const Chat = require('./widgets/chat');
-const Command = require('./widgets/command');
+const CommandLine = require('./widgets/command');
 
 let chat = null;
 
@@ -31,12 +33,13 @@ chat = new Chat({
 //  hidden: true,
 });
 
-const command = new Command({
+const command = new CommandLine({
   parent: screen,
   top: '100%-1',
   height: 1,
   chat,
   client,
+  config,
 })
 
 chat.command = command

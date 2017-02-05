@@ -121,6 +121,7 @@ class Chat extends widget.Box {
         screen.render();
       }
     });
+
     this.messageBox.on('cancel', () => {
       this.command.setContent();
       screen.render();
