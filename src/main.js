@@ -36,6 +36,7 @@ const command = new Command({
   top: '100%-1',
   height: 1,
   chat,
+  client,
 })
 
 chat.command = command
