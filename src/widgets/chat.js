@@ -7,7 +7,8 @@ module.exports =
 class Chat extends widget.Box {
   constructor(options) {
     super(options);
-    const command = options.command;
+
+    this.command = options.command;
     const screen = this.screen;
     const client = this.client = options.client;
     const config = this.config = options.config;
@@ -16,8 +17,13 @@ class Chat extends widget.Box {
       parent: this,
     });
 
-    const messages = this.messagesBox = blessed.box({
+    const maintab = this.maintab = blessed.box({
       parent: chatbox,
+      height: '100%-4',
+    });
+
+    const messages = this.messagesBox = blessed.box({
+      parent: maintab,
       border: 'line',
       style: {
         focus: {
@@ -28,13 +34,12 @@ class Chat extends widget.Box {
       },
       keyable: true,
       //height: '40%',
-      height: '100%-4',
       keys: true,
       vi: true,
       width: '80%',
       scrollable: true,
       scrollbar: {
-        ch: 'x',
+        ch: ' ',
         inverse: true,
         style: {
           bg: 'red',
@@ -49,9 +54,8 @@ class Chat extends widget.Box {
     this.users = [];
 
     this.usersBox = blessed.box({
-      parent: chatbox,
+      parent: maintab,
       //height: '40%',
-      height: '100%-4',
       width: '20%',
       left: '80%',
       border: 'line',
@@ -87,8 +91,8 @@ class Chat extends widget.Box {
       inputOnFocus: true,
     });
 
-    const logbox = this.logBox = blessed.box({
-      parent: this,
+    const logtab = this.logBox = blessed.box({
+      parent: chatbox,
       hidden: true,
       border: 'line',
       scrollable: true,
@@ -108,23 +112,28 @@ class Chat extends widget.Box {
       this.messageBox.clearValue();
       screen.render();
       client.sendTextMessage(message);
-      this.addMessage({ t: message, u: client.todo.w_userno });
       this.messageBox.focus();
-      screen.render();
+    });
+    client.on('send', (data) => {
+      data = data.xml;
+      if (data.m && data.m.attributes.t) {
+        this.addMessage(data.m.attributes);
+        screen.render();
+      }
     });
     this.messageBox.on('cancel', () => {
-      command.setContent();
+      this.command.setContent();
       screen.render();
     });
 
     chatbox.key(['i'], () => {
-      command.setContent("{bold}-- INSERT --{/}");
+      this.command.setContent("{bold}-- INSERT --{/}");
       this.messageBox.focus();
       screen.render();
     });
 
     client.on('connect', () => {
-      command.setContent('connecting to ' + client.todo.w_useroom + '...');
+      this.command.setContent('connecting to ' + client.todo.w_useroom + '...');
       while (this.messagesBox.children.length) {
         const message = this.messagesBox.children[this.messagesBox.children.length - 1];
         this.messagesBox.remove(message);
@@ -138,7 +147,7 @@ class Chat extends widget.Box {
       if (data.xml.m)
         this.addMessage(data.xml.m.attributes);
       else {
-        command.setContent(JSON.stringify(data.xml));
+        this.command.setContent(JSON.stringify(data.xml));
       }
       screen.render();
     });
@@ -164,7 +173,7 @@ class Chat extends widget.Box {
     });
 
     client.on('ee-done', () => {
-      command.setContent('connected');
+      this.command.setContent('connected');
       this.rebuildUserList();
       screen.render();
     });
@@ -207,7 +216,7 @@ class Chat extends widget.Box {
       content: '{bold}' + blessed.escape(content) + '{/}',
       top: 0,
       height: height,
-      left: 20,
+      left: 21,
       tags: true,
     });
 
@@ -290,6 +299,7 @@ class Chat extends widget.Box {
         --lvl;
     }
     filtered = filtered.join('');
+    filtered = filtered.trim();
     if (filtered.length === 0 || filtered.length === 1 && filtered[0] === '$')
       filtered = user.u;
     return filtered;
