@@ -48,7 +48,7 @@ class CommandLine extends widget.textbox {
   }
 
   handleSubmit(value) {
-    const { chat, client, screen } = this
+    const { chat, client, screen, config } = this
     const setError = (message) => {
       this.setContent('{red-bg}{white-fg}{bold}' + message + '{/}');
       screen.render();
@@ -125,6 +125,17 @@ class CommandLine extends widget.textbox {
         //return setError('Usage: hiddenmode [on|off]');
       }
       //hiddenMode = args[1].toLowerCase() === 'on';
+    } else if (cmd === 'fromsol') {
+      config.fromSol(value.split(' ').slice(1).join())
+        .then(() => {
+          client.end()
+          const { w_useroom } = client.todo
+          client.todo = Object.assign({}, this.config.user.todo, {
+            w_useroom,
+          })
+          client.connect()
+        })
+        .catch((e) => setError(JSON.stringify(e)))
     } else {
       return setError('Unknown command: ' + value);
     }
