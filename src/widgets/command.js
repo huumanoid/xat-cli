@@ -76,7 +76,7 @@ class CommandLine extends widget.textbox {
     } else if (cmd === 'nolog') {
       chat.logBox.hide();
       chat.maintab.show();
-      chat.maintab.focus();
+      chat.chatbox.focus();
       screen.realloc();
       screen.render();
     } else if (cmd === 'signin') {
