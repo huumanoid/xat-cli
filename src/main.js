@@ -25,25 +25,24 @@ const screen = blessed.screen({
 
 const client = new XatUser(config.user).addExtension('user-actions').addExtension('extended-events').addExtension('chat-data').addExtension('lurker-timeout');
 
+const command = new CommandLine({
+  parent: screen,
+  top: '100%-1',
+  height: 1,
+  client,
+  config,
+})
+
 chat = new Chat({ 
   parent: screen,
   height: '100%-1',
   config: config,
   client: client,
+  command,
 //  hidden: true,
-});
-
-const command = new CommandLine({
-  parent: screen,
-  top: '100%-1',
-  height: 1,
-  chat,
-  client,
-  config,
 })
 
-chat.command = command
-
+command.chat = chat
 
 chat.chatbox.focus();
 
