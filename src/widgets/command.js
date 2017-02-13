@@ -59,27 +59,42 @@ class CommandLine extends widget.textbox {
 
     const args = value.split(' ');
     const cmd = args[0];
+    const argTail = args.slice(1).join()
+
     let error = null;
     let response = ''
 
-    if (value === 'q') {
-      process.exit();
+    const nolog = () => {
+      chat.logBox.hide();
+      chat.currentTab.show();
+      chat.chatbox.focus();
+      screen.realloc();
+      screen.render();
+    }
+
+    if (value[0] ===  'q') {
+      const all = value[1]
+      if (!chat.logBox.hidden && !all) {
+        nolog()
+      } else {
+        process.exit();
+      }
     } else if (value === 'm') {
       chat.messagesBox.focus();
+    } else if (value === 'w') {
+      config.save().catch((e) => {
+        setError(JSON.stringify(e))
+      })
     } else if (value === 'u') {
       chat.usersBox.focus();
     } else if (cmd === 'log') {
-      chat.maintab.hide();
+      chat.currentTab.hide();
       chat.logBox.show();
       chat.logBox.focus();
       screen.realloc();
       screen.render();
     } else if (cmd === 'nolog') {
-      chat.logBox.hide();
-      chat.maintab.show();
-      chat.chatbox.focus();
-      screen.realloc();
-      screen.render();
+      nolog()
     } else if (cmd === 'signin') {
       client.sendTextMessage('/go#' + args[1]);
       const redirect = function redirect(data) {
@@ -127,7 +142,7 @@ class CommandLine extends widget.textbox {
       }
       //hiddenMode = args[1].toLowerCase() === 'on';
     } else if (cmd === 'fromsol') {
-      config.fromSol(value.split(' ').slice(1).join())
+      config.fromSol(argTail)
         .then(() => {
           client.end()
           const { w_useroom } = client.todo
@@ -137,9 +152,21 @@ class CommandLine extends widget.textbox {
           client.connect()
         })
         .catch((e) => setError(JSON.stringify(e)))
+    } else if (cmd === 'chname') {
+      this.client.todo.w_name = argTail
+    } else if (cmd === 'reconnect') {
+      client.end()
+      client.connect()
+    } else if (cmd === 'tab') {
+      chat.tabsBar.selectTab(parseInt(argTail) - 1)
+    } else if (cmd === 'tabf') {
+      chat.tabsBar.focus()
+    } else if (cmd === 'pc') {
+      chat.createPC(argTail)
     } else {
       return setError('Unknown command: ' + value);
     }
+
     this.setValue('');
     screen.render();
   }
