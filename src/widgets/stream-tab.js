@@ -15,6 +15,8 @@ class StreamTab extends widget.box {
 
     this.config = options.config
     this.command = options.command
+    this.name = options.name || null
+    this.selected = options.selected || false
 
     this.users = []
 
@@ -94,7 +96,6 @@ class StreamTab extends widget.box {
           user.online = online;
           this.addUser(user);
           this.screen.render();
-          this.addUser(data)
         }
         break
       case 'user-out': {
@@ -238,7 +239,7 @@ class StreamTab extends widget.box {
     messageBox.on('submit', (message) => {
       messageBox.clearValue()
       this.screen.render()
-      this.client.sendTextMessage(message)
+      this.submitMessage(message)
       messageBox.focus()
     })
 
@@ -247,6 +248,10 @@ class StreamTab extends widget.box {
       this.screen.render()
     });
     return messageBox
+  }
+
+  submitMessage(message) {
+    this.client.sendTextMessage(message)
   }
 
   addUser(user) {

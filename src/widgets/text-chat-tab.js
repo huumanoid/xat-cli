@@ -15,14 +15,17 @@ class TextChatTab extends StreamTab {
       return data.xml.m && data.xml.m.attributes.t
     })
 
-    super(Object.assign(options, { filters }))
+    super(Object.assign({}, options, { filters }))
   }
 
   addMessage(channel, data) {
-    const message = data.xml.m.attributes
+    const xml = data.xml
+    const message = xml[Object.keys(xml)[0]].attributes
 
     const userId = message.u ? message.u.split('_')[0] : null;
-    const content = message.t || '';
+    let content = message.t || '';
+
+    content = blessed.helpers.dropUnicode(content)
     let userName = 'none';
     let user = null;
 
@@ -73,9 +76,6 @@ class TextChatTab extends StreamTab {
     const height = (content.length / maxContentWidth | 0) + (content.length % maxContentWidth > 0);
 
     messageContainer.height = messageContent.height = height
-
-    if (true) {
-    }
   }
 
   addOutputMessage(data) {
