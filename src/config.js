@@ -63,8 +63,20 @@ class ConfigurationManager {
         if (err) return reject(err)
         const sol = solReader.read(data)
 
-        this.user.todo = sol
-        
+        for (const key in sol) {
+          let clientKey = key
+          if (key === 'w_k1c') {
+            clientKey = 'w_k1'
+          }
+
+          let value = sol[key]
+          if (typeof value === 'number') {
+            value = String(value)
+          }
+
+          this.user.todo[clientKey] = value
+        }
+
         const storedName = path.join(this.paths.profiles, new Date().getTime() + '.json')
         fs.writeFile(storedName, JSON.stringify(sol), (err) => {
           if (err) return reject(err)
