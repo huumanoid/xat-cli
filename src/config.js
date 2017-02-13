@@ -19,6 +19,8 @@ const mkdir = (dirName) => {
 module.exports =
 class ConfigurationManager {
   constructor() {
+    this.innerProps = ['innerProps', 'fromSol', 'paths', 'save']
+
     const home = os.homedir()
     const configDir = path.join(home, '.xatclirc')
     const configFile = path.join(configDir, 'config.json')
@@ -27,29 +29,32 @@ class ConfigurationManager {
     mkdir(configDir)
     mkdir(profilesPath)
 
-    // let config = null
-
+    let config = null
     try {
       fs.lstat(configFile)
-      // config = fs.readFileSync(configFile)
+      config = fs.readFileSync(configFile)
     } catch (e) {
       const defaultConfig = path.join(__dirname, '../config.json')
       const configData = fs.readFileSync(defaultConfig)
 
       fs.writeFileSync(configFile, configData)
 
-      // config = configData
+      config = configData
     }
 
     this.paths = {
       profiles: profilesPath,
+      configFile,
     }
 
-    const config = require(configFile)// JSON.parse(config.toString('utf8'))
+    config = JSON.parse(config)
     for (const key in config) {
       this[key] = config[key]
     }
 
+    if (this.user.todo.w_useroom == null) {
+      this.user.todo.w_useroom = 1
+    }
   }
 
   fromSol(fileName) {
