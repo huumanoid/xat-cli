@@ -85,4 +85,26 @@ class ConfigurationManager {
       })
     })
   }
+
+  save() {
+    return new Promise((resolve, reject) => {
+      const config = {}
+
+      for (const key in this) {
+        if (this.innerProps.indexOf(key) < 0) {
+          let value = this[key]
+          if (typeof(value) === 'function') {
+            value = value.toString()
+          }
+          config[key] = value
+        }
+      }
+
+      const configStr = JSON.stringify(config, null, '  ')
+      fs.writeFile(this.paths.configFile, configStr, (err) => {
+        if (err) return reject(err)
+        resolve()
+      })
+    })
+  }
 }
