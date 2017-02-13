@@ -104,7 +104,7 @@ class StreamTab extends widget.box {
           if (user) {
             user.online = false
             this.rebuildUserList()
-            screen.render()
+            this.screen.render()
           }
         }
         break
