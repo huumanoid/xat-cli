@@ -1,0 +1,21 @@
+{
+  "userColors": {
+    "guest": "green",
+    "member": "blue",
+    "moderator": "white",
+    "owner": "yellow",
+    "mainowner": "magenta",
+    "offline": "red",
+    "self": "cyan"
+  },
+  "history": {
+    "capacity": 40
+  }
+  "user": {
+    "todo": {
+      "w_autologin": 1,
+      "w_userno": "2",
+      "w_useroom": "1"
+    }
+  }
+}

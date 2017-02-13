@@ -21,7 +21,7 @@ class ConfigurationManager {
   constructor() {
     const home = os.homedir()
     const configDir = path.join(home, '.xatclirc')
-    const configFile = path.join(configDir, 'config.js')
+    const configFile = path.join(configDir, 'config.json')
     const profilesPath = path.join(configDir, 'profiles')
 
     mkdir(configDir)
@@ -33,7 +33,7 @@ class ConfigurationManager {
       fs.lstat(configFile)
       // config = fs.readFileSync(configFile)
     } catch (e) {
-      const defaultConfig = path.join(__dirname, '../config.js')
+      const defaultConfig = path.join(__dirname, '../config.json')
       const configData = fs.readFileSync(defaultConfig)
 
       fs.writeFileSync(configFile, configData)
