@@ -13,12 +13,13 @@ class CommandLine extends widget.textbox {
       tags: true,
     }))
 
-    this.history = new History(this)
 
     const screen = this.screen
     const chat = this.chat = options.chat
     const client = this.client = options.client
     const config = this.config = options.config
+
+    this.history = new History(this)
 
     const command = this
 
