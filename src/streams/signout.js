@@ -23,8 +23,20 @@ class LurkerLogStream extends StreamTab {
     const lurkerId = data.xml.l.attributes.u
     const datetime = new Date()
 
+    const getLurkerReport = (regname) =>
+      `${datetime.toLocaleDateString()} ${datetime.toLocaleTimeString()} id ${lurkerId} regname: ${regname}`
+
+    this.messagesBox.pushLine(getLurkerReport('fetching...'))
+
+    const lineNumber = this.messagesBox.getLines().length - 1
+
     xatapi.getRegname(lurkerId, (err, regname) => {
-      this.messagesBox.pushLine(`${datetime.toLocaleDateString()} ${datetime.toLocaleTimeString()} id ${lurkerId} regname: "${regname}"`)
+      if (err) {
+        regname = 'Not found'
+      }
+      this.messagesBox.setLine(lineNumber, getLurkerReport(regname))
+
+      this.screen.render()
     })
   }
 }
