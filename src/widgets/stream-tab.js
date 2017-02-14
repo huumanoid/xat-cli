@@ -20,6 +20,8 @@ class StreamTab extends widget.box {
     this.name = options.name || null
     this.selected = options.selected || false
 
+    this.history = options.history
+
     this.users = []
 
     this.self = {
@@ -72,6 +74,23 @@ class StreamTab extends widget.box {
         this.proceed('output', data)
       }
     })
+
+    this.proceedHistory()
+  }
+
+  proceedHistory() {
+    const { filters, history } = this
+    if (history == null) {
+      return
+    }
+
+    for (const entry of history) {
+      if (entry.channel === 'in' && filters.input(entry)) {
+        this.proceed('input', entry)
+      } else if (entry.channel === 'out' && filters.output(entry)) {
+        this.proceed('output', entry)
+      }
+    }
   }
 
   proceed(channel, data) {

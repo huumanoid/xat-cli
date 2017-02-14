@@ -25,6 +25,15 @@ const screen = blessed.screen({
 
 const client = new XatUser(config.user).addExtension('user-actions').addExtension('extended-events').addExtension('chat-data').addExtension('lurker-timeout');
 
+const history = []
+
+client.on('ee-event', (e) => {
+  history.push(Object.assign({ channel: 'in' }, e))
+})
+client.on('send', (e) => {
+  history.push(Object.assign({ channel: 'out' }, e))
+})
+
 const command = new CommandLine({
   parent: screen,
   top: '100%-1',
@@ -39,6 +48,7 @@ chat = new Chat({
   config: config,
   client: client,
   command,
+  history,
 //  hidden: true,
 })
 

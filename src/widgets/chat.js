@@ -17,6 +17,7 @@ class Chat extends widget.Box {
     const screen = this.screen
     const client = this.client = options.client
     const config = this.config = options.config
+    const history = this.history = options.history
 
     const tabs = this.tabs = []
 
@@ -37,7 +38,7 @@ class Chat extends widget.Box {
     });
 
 
-    const chattab = new TextChatTab({//Stream({
+    const chattab = new TextChatTab({
       parent: chatbox,
       height: '100%-1',
       client,
@@ -45,6 +46,7 @@ class Chat extends widget.Box {
       config,
       command: this.command,
       name: 'main',
+      history,
     });
 
     tabs.push(chattab)
@@ -57,6 +59,7 @@ class Chat extends widget.Box {
       hidden: true,
       command: this.command,
       name: 'log',
+      history,
     }))
 
     this.self = {
@@ -169,6 +172,7 @@ class Chat extends widget.Box {
       hidden: true,
       command: this.command,
       selected: true,
+      history: this.history,
     }, tabOpts)
 
     this.tabs.push(new TabType(opts))
