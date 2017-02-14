@@ -72,7 +72,7 @@ class CommandLine extends widget.textbox {
       screen.render();
     }
 
-    if (value[0] ===  'q') {
+    if (value[0] === 'q') {
       const all = value[1]
       if (!chat.logBox.hidden && !all) {
         nolog()
@@ -80,13 +80,13 @@ class CommandLine extends widget.textbox {
         process.exit();
       }
     } else if (value === 'm') {
-      chat.messagesBox.focus();
+      chat.currentTab.messagesBox.focus();
     } else if (value === 'w') {
       config.save().catch((e) => {
         setError(JSON.stringify(e))
       })
     } else if (value === 'u') {
-      chat.usersBox.focus();
+      chat.currentTab.usersBox.focus();
     } else if (cmd === 'log') {
       chat.currentTab.hide();
       chat.logBox.show();
