@@ -77,7 +77,12 @@ class Chat extends widget.Box {
       },
     })
 
-    chatbox.key(['i'], () => {
+    // Listener is required to capture 'key i' for chatbox itself.
+    // Without this listener, 'element key i' wouldn't be called
+    // when 'i' pressed in chatbox itself.
+    chatbox.on('key i', () => {})
+
+    chatbox.on('element key i', () => {
       this.command.setContent("{bold}-- INSERT --{/}")
       this.currentTab.messageBox.focus()
       screen.render()

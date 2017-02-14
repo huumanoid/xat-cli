@@ -26,15 +26,8 @@ class StreamTab extends widget.box {
     }
 
     const messages = this.messagesBox = this.getMessagesComponent()
-    messages.on('keypress', (ch, key) => {
-      this.parent.emit('key ' + key.full);
-    })
 
     this.usersBox = this.getUsersComponent()
-
-    this.usersBox.on('keypress', (ch, key) => {
-      this.parent.emit('key ' + key.full);
-    })
 
     this.messageBox = this.getMessageBox()
 
@@ -211,8 +204,6 @@ class StreamTab extends widget.box {
         this.screen.render()
       }
       //this.messagesBox.setContent(JSON.stringify({ch, key, selected, newSelected}))
-
-      chatbox.emit('key ' + key.full);
     })
 
     return usersBox
