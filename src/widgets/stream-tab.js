@@ -3,6 +3,8 @@ const blessed = require('blessed')
 const widget = blessed.widget
 const util = require('util');
 
+const History = require('../util/history')
+
 module.exports =
 class StreamTab extends widget.box {
   constructor(options) {
@@ -238,6 +240,8 @@ class StreamTab extends widget.box {
       this.command.setContent()
       this.screen.render()
     });
+
+    messageBox.history = new History(messageBox)
     return messageBox
   }
 
