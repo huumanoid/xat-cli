@@ -6,6 +6,7 @@ const util = require('util');
 const Stream = require('./stream-tab')
 const TextChatTab = require('./text-chat-tab')
 const PrivateChatTab = require('./private-chat')
+const LurkerLogStream = require('../streams/signout')
 
 module.exports =
 class Chat extends widget.Box {
@@ -155,23 +156,36 @@ class Chat extends widget.Box {
     }
   }
 
-  createPC(userno) {
+  createAndOpenTab(TabType, tabOpts) {
     for (const tab of this.tabs) {
       tab.selected = false
     }
 
-    this.tabs.push(new PrivateChatTab({
+    const opts = Object.assign({}, {
       parent: this.chatbox,
       height: '100%-1',
       client: this.client,
       config: this.config,
       hidden: true,
       command: this.command,
-      name: 'pc ' + userno,
-      dest: userno,
       selected: true,
-    }))
+    }, tabOpts)
+
+    this.tabs.push(new TabType(opts))
 
     this.updateTabs()
+  }
+
+  createPC(userno) {
+    return this.createAndOpenTab(PrivateChatTab, {
+      name: 'pc-' + userno,
+      dest: userno,
+    })
+  }
+
+  createLurkerLog() {
+    return this.createAndOpenTab(LurkerLogStream, {
+      name: 'lurker-log',
+    })
   }
 }

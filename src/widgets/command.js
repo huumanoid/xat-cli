@@ -163,6 +163,8 @@ class CommandLine extends widget.textbox {
       chat.tabsBar.focus()
     } else if (cmd === 'pc') {
       chat.createPC(argTail)
+    } else if (cmd === 'lurkerlog') {
+      chat.createLurkerLog()
     } else {
       return setError('Unknown command: ' + value);
     }

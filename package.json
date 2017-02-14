@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "blessed": "^0.1.81",
-    "xat-client": "github:huumanoid/xat-client#4045c525ef8b9f54e8315b674c2deacc0927d2f2"
+    "xat-client": "github:huumanoid/xat-client#4045c525ef8b9f54e8315b674c2deacc0927d2f2",
+    "xatapi": "github:xsloom/xatapi#4d0bd7b11faa65bf5bef668e584f8b4efded82be"
   }
 }
