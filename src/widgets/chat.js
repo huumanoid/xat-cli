@@ -176,6 +176,14 @@ class Chat extends widget.Box {
     this.updateTabs()
   }
 
+  createPM(userno) {
+    return this.createAndOpenTab(PrivateChatTab, {
+      name: 'pm-' + userno,
+      dest: userno,
+      method: 'pm',
+    })
+  }
+
   createPC(userno) {
     return this.createAndOpenTab(PrivateChatTab, {
       name: 'pc-' + userno,

@@ -161,6 +161,8 @@ class CommandLine extends widget.textbox {
       chat.tabsBar.selectTab(parseInt(argTail) - 1)
     } else if (cmd === 'tabf') {
       chat.tabsBar.focus()
+    } else if (cmd === 'pm') {
+      chat.createPM(argTail)
     } else if (cmd === 'pc') {
       chat.createPC(argTail)
     } else if (cmd === 'lurkerlog') {

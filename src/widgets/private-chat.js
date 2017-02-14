@@ -22,13 +22,19 @@ class PrivateChatTab extends TextChatTab {
     const filteredOptions = Object.assign({}, options, { filters })
 
     delete filteredOptions.dest
+    delete filteredOptions.method
     super(filteredOptions)
 
     this.dest = options.dest
+    this.method = options.method
   }
 
   submitMessage(message) {
-    this.client.sendPCMessage({ message, receiver: this.dest })
+    if (this.method === 'pm') {
+      this.client.sendPMMessage({ message, receiver: this.dest })
+    } else {
+      this.client.sendPCMessage({ message, receiver: this.dest })
+    }
   }
 }
 
