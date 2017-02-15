@@ -72,8 +72,8 @@ class CommandLine extends widget.textbox {
       screen.render();
     }
 
-    if (value[0] === 'q') {
-      const all = value[1]
+    if (cmd === 'q' || cmd === 'qa') {
+      const all = cmd[1] === 'a'
       if (!chat.logBox.hidden && !all) {
         nolog()
       } else {
@@ -167,6 +167,8 @@ class CommandLine extends widget.textbox {
       chat.createPC(argTail)
     } else if (cmd === 'lurkerlog') {
       chat.createLurkerLog()
+    } else if (cmd === 'qt') {
+      chat.closeCurrentTab()
     } else {
       return setError('Unknown command: ' + value);
     }

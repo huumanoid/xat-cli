@@ -200,4 +200,16 @@ class Chat extends widget.Box {
       name: 'lurker-log',
     })
   }
+
+  closeCurrentTab() {
+    const i = this.tabs.indexOf(this.currentTab)
+
+    const deleted = this.tabs.splice(i, 1)[0]
+
+    ;(this.tabs[i] || this.tabs[i - 1] || {}).selected = true
+
+    deleted.destroy()
+
+    this.updateTabs()
+  }
 }
