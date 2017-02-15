@@ -17,6 +17,8 @@ class PrivateChatTab extends TextChatTab {
         const node = xml.p || xml.z
         return node && node.attributes.d === destination
       },
+      userIn: ({xml}) => (xml.u || xml.o).attributes.u === destination,
+      userOut: ({xml}) => xml.l.attributes.u === destination
     }
 
     const filteredOptions = Object.assign({}, options, { filters })

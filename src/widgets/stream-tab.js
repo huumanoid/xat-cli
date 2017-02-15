@@ -4,6 +4,7 @@ const widget = blessed.widget
 const util = require('util');
 
 const History = require('../util/history')
+const and = require('../util/predicates').and
 
 module.exports =
 class StreamTab extends widget.box {
@@ -14,6 +15,8 @@ class StreamTab extends widget.box {
     const filters = this.filters = options.filters || {}
     filters.input = filters.input || (() => true)
     filters.output = filters.output || (() => true)
+    filters.userIn = and(e => e.types.indexOf('user') >= 0, filters.userIn)
+    filters.userOut = and(e => e.types.indexOf('user-signout') >= 0, filters.userOut)
 
     this.config = options.config
     this.command = options.command
@@ -22,12 +25,18 @@ class StreamTab extends widget.box {
 
     this.history = options.history
 
-    this.users = []
-
-    this.self = {
-      u: String(client.todo.w_userno),
-      n: client.todo.w_name,
+    const createSelf = () => {
+      return {
+        u: String(client.todo.w_userno),
+        n: client.todo.w_name,
+      }
     }
+
+    const createUsersArray = () => [this.self]
+
+    this.self = createSelf()
+
+    this.users = createUsersArray()
 
     const messages = this.messagesBox = this.getMessagesComponent()
 
@@ -50,22 +59,25 @@ class StreamTab extends widget.box {
         const message = this.messagesBox.children[this.messagesBox.children.length - 1]
         this.messagesBox.remove(message)
       }
-      this.users = [this.self]
+      this.self = createSelf()
+      this.users = createUsersArray()
       this.rebuildUserList()
       this.screen.render()
     })
-
-    client.on('ee-user-signout', this.proceed.bind(this, 'user-out'))
-
-    client.on('ee-user', this.proceed.bind(this, 'user-in'))
 
     client.on('ee-chat-meta', ({xml}) => {
       this.self.f = xml.i.attributes.r
     })
 
-    client.on('ee-event', (data) => {
-      if (filters.input(data)) {
-          this.proceed('input', data)
+    client.on('ee-event', (e) => {
+      if (filters.input(e)) {
+          this.proceed('input', e)
+      }
+      if (filters.userIn(e)) {
+        this.proceed('user-in', e)
+      }
+      if (filters.userOut(e)) {
+        this.proceed('user-out', e)
       }
     })
 
@@ -85,8 +97,16 @@ class StreamTab extends widget.box {
     }
 
     for (const entry of history) {
-      if (entry.channel === 'in' && filters.input(entry)) {
-        this.proceed('input', entry)
+      if (entry.channel === 'in') {
+        if (filters.input(entry)) {
+          this.proceed('input', entry)
+        }
+        if (filters.userIn(entry)) {
+          this.proceed('user-in', entry)
+        }
+        if (filters.userOut(entry)) {
+          this.procees('user-out', entry)
+        }
       } else if (entry.channel === 'out' && filters.output(entry)) {
         this.proceed('output', entry)
       }
@@ -301,13 +321,14 @@ class StreamTab extends widget.box {
       const element = usersBox.children[usersBox.children.length - 1]
       usersBox.remove(element)
     }
+
     this.users.sort((u1, u2) => {
-      if (u1.u === this.client.todo.w_userno) {
-        return 1;
+      if (u1.u === this.self.u) {
+        return -1;
       }
 
-      if (u2.u === this.client.todo.w_userno) {
-        return -1;
+      if (u2.u === this.self.u) {
+        return 1;
       }
 
       if (u1.online != u2.online) {
