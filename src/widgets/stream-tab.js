@@ -208,11 +208,11 @@ class StreamTab extends widget.box {
 
       if (prevSelected != null
         && prevSelected < list.children.length) {
-        list.children[prevSelected].style.bg = -1
+        delete list.children[prevSelected].style.bg
       }
 
       if (list.focused && n >= 0) {
-        list.children[n].style.bg = 0xff0000
+        list.children[n].style.bg = 'red'
       }
 
       list.selected = n
