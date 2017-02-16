@@ -44,17 +44,17 @@ class StreamTab extends widget.box {
 
     this.messageBox = this.getMessageBox()
 
-    client.on('close', () => {
+    this._addListener(client, 'close', () => {
       this.self.online = false
     })
 
-    client.on('ee-done', () => {
+    this._addListener(client, 'ee-done', () => {
       this.self.online = true
       this.rebuildUserList()
       this.screen.render()
     })
 
-    client.on('connect', () => {
+    this._addListener(client, 'connect', () => {
       while (this.messagesBox.children.length) {
         const message = this.messagesBox.children[this.messagesBox.children.length - 1]
         this.messagesBox.remove(message)
@@ -65,11 +65,11 @@ class StreamTab extends widget.box {
       this.screen.render()
     })
 
-    client.on('ee-chat-meta', ({xml}) => {
+    this._addListener(client, 'ee-chat-meta', ({xml}) => {
       this.self.f = xml.i.attributes.r
     })
 
-    client.on('ee-event', (e) => {
+    this._addListener(client, 'ee-event', (e) => {
       if (filters.input(e)) {
           this.proceed('input', e)
       }
@@ -81,13 +81,23 @@ class StreamTab extends widget.box {
       }
     })
 
-    client.on('send', (data) => {
-      if (filters.output(data)) {
-        this.proceed('output', data)
+    this._addListener(client, 'send', (e) => {
+      if (filters.output(e)) {
+        this.proceed('output', e)
       }
     })
 
     this.proceedHistory()
+  }
+
+  _addListener(emitter, event, callback) {
+    if (this.createdListeners == null) {
+      this.createdListeners = []
+    }
+
+    emitter.on(event, callback)
+
+    this.createdListeners.push({ emitter, event, callback })
   }
 
   proceedHistory() {
@@ -401,5 +411,14 @@ class StreamTab extends widget.box {
 
     const rankcolors = [colors.guest, colors.mainowner, colors.moderator, colors.member, colors.owner];
     return !user.online ? colors.offline : rankcolors[user.f & 7];
+  }
+
+  destroy() {
+    if (this.createdListeners != null) {
+      for (const { emitter, event, callback } of this.createdListeners) {
+        emitter.removeListener(event, callback)
+      }
+    }
+    super.destroy.apply(this, arguments)
   }
 }
