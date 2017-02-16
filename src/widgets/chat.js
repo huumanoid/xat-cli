@@ -51,6 +51,10 @@ class Chat extends widget.Box {
       height: 1,
       autoCommandKeys: false,
       style: {
+        item: {
+          bg: (el) => el._.cmd.tab.updated ? 'yellow' : null,
+          fg: (el) => el._.cmd.tab.updated ? 'black' : null,
+        },
         selected: {
           bg: 'blue',
         },
@@ -106,7 +110,7 @@ class Chat extends widget.Box {
   }
 
   updateTabs() {
-    const items = {}
+    const items = []
 
     const selectTab = (tab) => {
       if (this.currentTab) {
@@ -125,7 +129,12 @@ class Chat extends widget.Box {
     for (let i = 0; i < this.tabs.length; ++i) {
       const tab = this.tabs[i]
       const name = tab.name ? tab.name : i
-      items[name] = selectTab.bind(null, tab)
+
+      items.push({
+        callback: selectTab.bind(null, tab),
+        text: name,
+        tab,
+      })
 
       if (tab.selected) {
         selected = i

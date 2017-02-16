@@ -88,6 +88,10 @@ class StreamTab extends widget.box {
     })
 
     this.proceedHistory()
+
+    this.on('visible', () => {
+      this.updated = false
+    })
   }
 
   _addListener(emitter, event, callback) {
@@ -152,6 +156,12 @@ class StreamTab extends widget.box {
           }
         }
         break
+      default:
+        throw new Error('Unknown channel')
+    }
+
+    if (!this.visible) {
+      this.updated = true
     }
   }
 
