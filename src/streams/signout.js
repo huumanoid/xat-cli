@@ -4,8 +4,6 @@ const widget = blessed.widget
 const StreamTab = require('../widgets/stream-tab')
 const xatapi = require('xatapi')
 
-const and = require('../util/predicates').and
-
 module.exports =
 class LurkerLogStream extends StreamTab {
   constructor(options) {
