@@ -90,7 +90,7 @@ class StreamTab extends widget.box {
 
     this.proceedHistory()
 
-    this.on('visible', () => {
+    this.on('show', () => {
       this.updated = false
     })
   }
