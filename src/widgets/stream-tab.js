@@ -223,11 +223,11 @@ class StreamTab extends widget.box {
     usersBox.on('blur', () => usersBox.select())
 
     usersBox.on('keypress', (ch, key) => {
-      const list = usersBox
-      const selected = list.selected
+      const selected = usersBox.selected
+
       let newSelected = null
       if (key.name === 'down' || key.name === 'j') {
-        if (selected < list.children.length - 1) {
+        if (selected < usersBox.children.length - 1) {
           newSelected = selected + 1
         }
       }
@@ -238,11 +238,7 @@ class StreamTab extends widget.box {
       }
 
       if (newSelected != null) {
-        const children = list.children
-        children[selected].style.bg = -1
-        children[newSelected].style.bg = 0xff0000
-        list.selected = newSelected
-        this.screen.render()
+        usersBox.select(newSelected)
       }
       //this.messagesBox.setContent(JSON.stringify({ch, key, selected, newSelected}))
     })
