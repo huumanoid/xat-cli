@@ -38,30 +38,6 @@ class Chat extends widget.Box {
     });
 
 
-    const chattab = new TextChatTab({
-      parent: chatbox,
-      height: '100%-1',
-      client,
-      hidden: true,
-      config,
-      command: this.command,
-      name: 'main',
-      history,
-    });
-
-    tabs.push(chattab)
-
-    tabs.push(new Stream({
-      parent: chatbox,
-      height: '100%-1',
-      client,
-      config,
-      hidden: true,
-      command: this.command,
-      name: 'log',
-      history,
-    }))
-
     this.self = {
       u: String(client.todo.w_userno),
       n: client.todo.w_name,
@@ -80,6 +56,10 @@ class Chat extends widget.Box {
         },
       },
     })
+
+    this.addTab(TextChatTab, { name: 'main' })
+    this.addTab(Stream, { name: 'log' })
+
 
     // Listener is required to capture 'key i' for chatbox itself.
     // Without this listener, 'element key i' wouldn't be called
@@ -159,23 +139,28 @@ class Chat extends widget.Box {
     }
   }
 
-  createAndOpenTab(TabType, tabOpts) {
-    for (const tab of this.tabs) {
-      tab.selected = false
-    }
-
-    const opts = Object.assign({}, {
+  addTab(TabType, tabOptions) {
+    const opts = Object.assign({
       parent: this.chatbox,
       height: '100%-1',
       client: this.client,
       config: this.config,
       hidden: true,
       command: this.command,
-      selected: true,
       history: this.history,
-    }, tabOpts)
+    }, tabOptions)
 
     this.tabs.push(new TabType(opts))
+  }
+
+  createAndOpenTab(TabType, tabOptions) {
+    for (const tab of this.tabs) {
+      tab.selected = false
+    }
+
+    const opts = Object.assign({ selected: true }, tabOptions)
+
+    this.addTab(TabType, opts)
 
     this.updateTabs()
   }
