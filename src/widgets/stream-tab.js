@@ -5,6 +5,7 @@ const util = require('util');
 
 const History = require('../util/history')
 const and = require('../util/predicates').and
+const UserInfo = require('./user-info')
 
 module.exports =
 class StreamTab extends widget.box {
@@ -263,7 +264,34 @@ class StreamTab extends widget.box {
       //this.messagesBox.setContent(JSON.stringify({ch, key, selected, newSelected}))
     })
 
+    usersBox.on('key enter', () => {
+      this.closeUserInfo()
+
+      this.userInfo = new UserInfo({
+        parent: this,
+        tags: true,
+        user: usersBox.children[usersBox.selected].data.user,
+        top: 'center',
+        left: 'center',
+        height: 'shrink',
+        width: 'shrink',
+        style: {
+          bg: 'black',
+        },
+        border: 'line',
+      })
+      this.screen.render()
+    })
+
     return usersBox
+  }
+
+  closeUserInfo() {
+    if (this.userInfo) {
+      this.userInfo.destroy()
+    }
+
+    this.userinfo = null
   }
 
   getMessageBox() {

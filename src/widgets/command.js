@@ -169,6 +169,8 @@ class CommandLine extends widget.textbox {
       chat.createLurkerLog()
     } else if (cmd === 'qt') {
       chat.closeCurrentTab()
+    } else if (cmd === 'qu') {
+      chat.currentTab.closeUserInfo()
     } else {
       return setError('Unknown command: ' + value);
     }
